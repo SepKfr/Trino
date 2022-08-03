@@ -35,6 +35,17 @@ public class TestModelSerialization
     }
 
     @Test
+    public void testMlpClassifier()
+    {
+        Model model = new MlpClassifier();
+        model.train(getDataset());
+        Slice serialized = ModelUtils.serialize(model);
+        Model deserialized = ModelUtils.deserialize(serialized);
+        assertNotNull(deserialized, "deserialization failed");
+        assertTrue(deserialized instanceof MlpClassifier, "deserialized model is not a svm");
+    }
+
+    @Test
     public void testSvmRegressor()
     {
         Model model = new SvmRegressor();
@@ -43,6 +54,17 @@ public class TestModelSerialization
         Model deserialized = ModelUtils.deserialize(serialized);
         assertNotNull(deserialized, "deserialization failed");
         assertTrue(deserialized instanceof SvmRegressor, "deserialized model is not a svm");
+    }
+
+    @Test
+    public void testMlpRegressor()
+    {
+        Model model = new MlpRegressor();
+        model.train(getDataset());
+        Slice serialized = ModelUtils.serialize(model);
+        Model deserialized = ModelUtils.deserialize(serialized);
+        assertNotNull(deserialized, "deserialization failed");
+        assertTrue(deserialized instanceof MlpRegressor, "deserialized model is not a svm");
     }
 
     @Test
@@ -57,9 +79,31 @@ public class TestModelSerialization
     }
 
     @Test
+
+    public void testRegressorFeatureTransformerMlp()
+    {
+        Model model = new RegressorFeatureTransformer(new MlpRegressor(), new FeatureVectorUnitNormalizer());
+        model.train(getDataset());
+        Slice serialized = ModelUtils.serialize(model);
+        Model deserialized = ModelUtils.deserialize(serialized);
+        assertNotNull(deserialized, "deserialization failed");
+        assertTrue(deserialized instanceof RegressorFeatureTransformer, "deserialized model is not a regressor feature transformer");
+    }
+
+    @Test
     public void testClassifierFeatureTransformer()
     {
         Model model = new ClassifierFeatureTransformer(new SvmClassifier(), new FeatureVectorUnitNormalizer());
+        model.train(getDataset());
+        Slice serialized = ModelUtils.serialize(model);
+        Model deserialized = ModelUtils.deserialize(serialized);
+        assertNotNull(deserialized, "deserialization failed");
+        assertTrue(deserialized instanceof ClassifierFeatureTransformer, "deserialized model is not a classifier feature transformer");
+    }
+
+    public void testClassifierFeatureTransformerMlp()
+    {
+        Model model = new ClassifierFeatureTransformer(new MlpClassifier(), new FeatureVectorUnitNormalizer());
         model.train(getDataset());
         Slice serialized = ModelUtils.serialize(model);
         Model deserialized = ModelUtils.deserialize(serialized);
@@ -79,10 +123,33 @@ public class TestModelSerialization
     }
 
     @Test
+    public void testVarcharClassifierAdapterMlp()
+    {
+        Model model = new StringClassifierAdapter(new ClassifierFeatureTransformer(new MlpClassifier(), new FeatureVectorUnitNormalizer()));
+        model.train(getDataset());
+        Slice serialized = ModelUtils.serialize(model);
+        Model deserialized = ModelUtils.deserialize(serialized);
+        assertNotNull(deserialized, "deserialization failed");
+        assertTrue(deserialized instanceof StringClassifierAdapter, "deserialized model is not a varchar classifier adapter");
+    }
+
+    @Test
     public void testSerializationIds()
     {
         assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(SvmClassifier.class), 1);
         assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(SvmRegressor.class), 2);
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(FeatureVectorUnitNormalizer.class), 3);
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(ClassifierFeatureTransformer.class), 4);
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(RegressorFeatureTransformer.class), 5);
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(FeatureUnitNormalizer.class), 6);
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(StringClassifierAdapter.class), 7);
+    }
+
+    @Test
+    public void testSerializationIdsMlp()
+    {
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(MlpClassifier.class), 1);
+        assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(MlpRegressor.class), 2);
         assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(FeatureVectorUnitNormalizer.class), 3);
         assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(ClassifierFeatureTransformer.class), 4);
         assertEquals((int) ModelUtils.MODEL_SERIALIZATION_IDS.get(RegressorFeatureTransformer.class), 5);

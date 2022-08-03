@@ -56,9 +56,23 @@ public class TestMLQueries
     }
 
     @Test
+    public void testPredictionMlp()
+    {
+        assertQuery("SELECT classify(features(1, 2), model) " +
+                "FROM (SELECT learn_mlp_classifier(labels, features) AS model FROM (VALUES (1, features(1, 2))) t(labels, features)) t2", "SELECT 1");
+    }
+
+    @Test
     public void testVarcharPrediction()
     {
         assertQuery("SELECT classify(features(1, 2), model) " +
                 "FROM (SELECT learn_classifier(labels, features) AS model FROM (VALUES ('cat', features(1, 2))) t(labels, features)) t2", "SELECT 'cat'");
+    }
+
+    @Test
+    public void testVarcharPredictionMlp()
+    {
+        assertQuery("SELECT classify(features(1, 2), model) " +
+                "FROM (SELECT learn_mlp_classifier(labels, features) AS model FROM (VALUES ('cat', features(1, 2))) t(labels, features)) t2", "SELECT 'cat'");
     }
 }

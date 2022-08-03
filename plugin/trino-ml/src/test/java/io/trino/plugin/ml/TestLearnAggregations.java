@@ -83,6 +83,15 @@ public class TestLearnAggregations
         assertLearnClassifier(aggregationFunction.createAggregatorFactory(SINGLE, ImmutableList.of(0, 1, 2), OptionalInt.empty()).createAggregator());
     }
 
+    @Test
+    public void testLearnLibMlp()
+    {
+        TestingAggregationFunction aggregationFunction = FUNCTION_RESOLUTION.getAggregateFunction(
+                QualifiedName.of("learn_mlp_classifier"),
+                fromTypeSignatures(BIGINT.getTypeSignature(), mapType(BIGINT.getTypeSignature(), DOUBLE.getTypeSignature()), VARCHAR.getTypeSignature()));
+        assertLearnClassifier(aggregationFunction.createAggregatorFactory(SINGLE, ImmutableList.of(0, 1, 2), OptionalInt.empty()).createAggregator());
+    }
+
     private static void assertLearnClassifier(Aggregator aggregator)
     {
         aggregator.processPage(getPage());
